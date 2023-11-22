@@ -5,6 +5,7 @@ on:
             - '.txt'
             - 'LICENSE'
             - 'docs/**'
+    push:
 
 jobs:
     pr-build:
