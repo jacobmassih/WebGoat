@@ -1,6 +1,6 @@
-# #!/bin/bash
+#!/bin/bash
 
-# sudo hostnamectl set-hostname master
+sudo hostnamectl set-hostname master
 
 # sudo apt-get update
 
