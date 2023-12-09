@@ -29,12 +29,22 @@ jobs:
 
             -   name: Build with Maven
                 run: mvn --no-transfer-progress verify
+
+            -   uses: actions/upload-artifact@master
+                with:
+                    name: target
+                    path: target/
     
     docker-build-push:
         needs: build
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v3
+
+            -   uses: actions/download-artifact@master
+                with:
+                    name: target
+                    path: target/
 
             -   name: "Set up QEMU"
                 uses: docker/setup-qemu-action@v2.2.0
@@ -48,7 +58,7 @@ jobs:
                   username: ${{ secrets.DOCKERHUB_USERNAME_ID }}
                   password: ${{ secrets.DOCKERHUB_TOKEN_KEY }}
         
-            -   name: Build and push
+            -   name: Build and push Docker image
                 uses: docker/build-push-action@v5
                 with:
                     context: .
