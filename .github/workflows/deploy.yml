@@ -29,6 +29,10 @@ jobs:
             -   name: Build with Maven
                 run: mvn --no-transfer-progress verify
     
+    docker-build-push:
+        needs: build
+        runs-on: ubuntu-latest
+        steps:
             -   name: "Set up QEMU"
                 uses: docker/setup-qemu-action@v2.2.0
 
