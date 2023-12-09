@@ -7,7 +7,7 @@ on:
             - 'docs/**'
 
 jobs:
-    pr-build:
+    deploy:
         runs-on: ubuntu-latest
         steps:
             -   uses: actions/checkout@v3
@@ -45,4 +45,4 @@ jobs:
                 with:
                     context: .
                     push: true
-                    tags: jacobmassih/WebGoat:latest
+                    tags: jacobmassih/webGoat:latest
