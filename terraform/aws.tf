@@ -19,10 +19,10 @@ resource "aws_key_pair" "terraformkey" {
 }
 
 # create vpc
-data "aws_vpc" "k8s_vpc" {
+resource "aws_vpc" "k8s_vpc" {
   cidr_block       = "10.0.0.0/16"
-  enable_dns_hostnames=true
-  enable_dns_support =true
+  enable_dns_hostnames = true
+  enable_dns_support = true
   tags = {
     Name = "K8S VPC"
   }
@@ -112,7 +112,7 @@ resource "aws_instance" "k8s_master" {
 resource "aws_instance" "k8s_worker" {
   depends_on = [ aws_instance.k8s_master ]
   ami           = "ami-0fc5d935ebf8bc3bc"
-  vpc_security_group_ids = [aws_security_group.tp2_security_group.id]
+  vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
   instance_type = "m4.large"
   key_name = aws_key_pair.terraformkey.key_name
   root_block_device {
