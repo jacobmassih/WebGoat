@@ -12,6 +12,12 @@ provider "aws" {
   region = "us-east-1"
 }
 
+# Provides EC2 key pair
+resource "aws_key_pair" "terraformkey" {
+  key_name   = "terraform_key"
+  public_key = tls_private_key.k8s_ssh.public_key_openssh
+}
+
 # create vpc
 data "aws_vpc" "default" {
   default = true
@@ -44,6 +50,7 @@ resource "aws_instance" "k8s_master" {
   ami = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.tp2_security_group.id]
   instance_type = "m4.large"
+  key_name = aws_key_pair.terraformkey.key_name
   user_data = file("scripts/master.sh") # used to run script which deploys docker container on each instance
   tags = {
     Name = "k8s-master"
@@ -56,6 +63,7 @@ resource "aws_instance" "k8s_worker" {
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.tp2_security_group.id]
   instance_type = "m4.large"
+  key_name = aws_key_pair.terraformkey.key_name
   root_block_device {
     volume_size = 30
   }
