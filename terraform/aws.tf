@@ -19,39 +19,90 @@ resource "aws_key_pair" "terraformkey" {
 }
 
 # create vpc
-data "aws_vpc" "default" {
-  default = true
+data "aws_vpc" "k8s_vpc" {
+  cidr_block       = "10.0.0.0/16"
+  enable_dns_hostnames=true
+  enable_dns_support =true
+  tags = {
+    Name = "K8S VPC"
+  }
 }
 
-# create security group
-resource "aws_security_group" "tp2_security_group" {
-  name        = "tp2_security_group"
-  description = "Allow traffic to the m4 orchestrator"
-  vpc_id      = data.aws_vpc.default.id
-  
-  # Define your security group rules here
-  ingress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+# Create Subnet
+resource "aws_subnet" "public_subnet" {
+  vpc_id     = aws_vpc.k8s_vpc.id
+  cidr_block = "10.0.1.0/24"
+  map_public_ip_on_launch = true
+  availability_zone = "ap-south-1a"
+  tags = {
+    Name = "Public Subnet"
   }
-
+}
+# Create Internet Gateway
+resource "aws_internet_gateway" "k8s_gw" {
+  vpc_id = aws_vpc.k8s_vpc.id
+  tags = {
+    Name = "K8S GW"
+  }
+}
+# Create Routing table
+resource "aws_route_table" "k8s_route" {
+    vpc_id = aws_vpc.k8s_vpc.id
+    
+    route {
+        cidr_block = "0.0.0.0/0"
+        gateway_id = aws_internet_gateway.k8s_gw.id
+    }
+        
+        tags = {
+            Name = "K8S Route"
+        }
+}
+# Associate Routing table
+resource "aws_route_table_association" "k8s_asso" {
+    subnet_id = aws_subnet.public_subnet.id
+    route_table_id = aws_route_table.k8s_route.id
+}
+# Create security group
+resource "aws_security_group" "allow_ssh_http" {
+  name        = "Web_SG"
+  description = "Allow SSH and HTTP inbound traffic"
+  vpc_id      = aws_vpc.k8s_vpc.id
+  ingress {
+    description      = "Allow All"
+    from_port        = 0
+    to_port          = 0
+    protocol         = -1
+    cidr_blocks      = [ "0.0.0.0/0" ]
+  }
+  ingress {
+    description      = "Allow All"
+    from_port        = 0
+    to_port          = 0
+    protocol         = -1
+    cidr_blocks      = [ "0.0.0.0/0" ]
+  }
   egress {
-    from_port   = 0
-    to_port     = 0
-    protocol    = "-1"
-    cidr_blocks = ["0.0.0.0/0"]
+    from_port        = 0
+    to_port          = 0
+    protocol         = "-1"
+    cidr_blocks      = ["0.0.0.0/0"]
+    ipv6_cidr_blocks = ["::/0"]
+  }
+  tags = {
+    Name = "K8S SG"
   }
 }
 
 # create 1 m4.large orchestrator instance
 resource "aws_instance" "k8s_master" {
   ami = "ami-0fc5d935ebf8bc3bc"
-  vpc_security_group_ids = [aws_security_group.tp2_security_group.id]
+  vpc_security_group_ids = [ aws_security_group.allow_ssh_http.id ] 
   instance_type = "m4.large"
   key_name = aws_key_pair.terraformkey.key_name
   user_data = file("scripts/master.sh") # used to run script which deploys docker container on each instance
+  associate_public_ip_address = true
+  subnet_id = aws_subnet.public_subnet.id
   tags = {
     Name = "k8s-master"
   }
