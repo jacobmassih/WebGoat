@@ -1,0 +1,21 @@
+- name: Install Docker
+  become: true
+  apt:
+    name: docker.io
+    state: present
+
+- name: Install kubeadm, kubelet, and kubectl
+  become: true
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubeadm
+    - kubelet
+    - kubectl
+
+- name: Initialize Kubernetes Master
+  become: true
+  command: 
+    - kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_join_command.txt
+    - cat kubeadm_join_command.txt

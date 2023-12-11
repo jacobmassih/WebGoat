@@ -1,0 +1,19 @@
+- name: Install Docker
+  become: true
+  apt:
+    name: docker.io
+    state: present
+
+- name: Install kubeadm, kubelet, and kubectl
+  become: true
+  apt:
+    name: "{{ item }}"
+    state: present
+  loop:
+    - kubeadm
+    - kubelet
+    - kubectl
+
+- name: Join Kubernetes Cluster
+  become: true
+  command: "kubeadm join <master_ip>:<master_port> --token <your_token> --discovery-token-ca-cert-hash sha256:<your_hash>"

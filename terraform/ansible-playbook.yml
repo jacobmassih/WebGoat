@@ -1,0 +1,13 @@
+- name: Install Kubernetes Master
+  hosts: k8s-master
+  become: true
+  remote_user: ec2-user
+  roles:
+    - kubernetes-master
+
+- name: Install Kubernetes Worker
+  hosts: k8s-worker
+  become: true
+  remote_user: ansible
+  roles:
+    - kubernetes-worker

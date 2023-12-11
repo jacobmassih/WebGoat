@@ -40,19 +40,19 @@ resource "aws_security_group" "tp2_security_group" {
 }
 
 # create 1 m4.large orchestrator instance
-resource "aws_instance" "master" {
+resource "aws_instance" "k8s_master" {
   ami = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.tp2_security_group.id]
   instance_type = "m4.large"
   user_data = file("scripts/master.sh") # used to run script which deploys docker container on each instance
   tags = {
-    Name = "master"
+    Name = "k8s-master"
   }
 }
 
 # create 4 m4.large worker instances
-resource "aws_instance" "worker" {
-  depends_on = [ aws_instance.master ]
+resource "aws_instance" "k8s_worker" {
+  depends_on = [ aws_instance.k8s_master ]
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.tp2_security_group.id]
   instance_type = "m4.large"
@@ -61,12 +61,16 @@ resource "aws_instance" "worker" {
   }
   user_data = file("scripts/worker.sh") # used to run script which deploys docker container on each instance
     tags = {
-      Name = "workers"
+      Name = "k8s-worker"
   } 
 }
 
 resource "local_file" "ansible_host" {
-    depends_on = [ aws_instance.worker ]
-    content     = "[Master_Node]\n${aws_instance.master.public_ip}\n\n[Worker_Node]\n${aws_instance.worker.public_ip}"
+    depends_on = [ aws_instance.k8s_worker ]
+    content     = "[Master_Node]\n${aws_instance.k8s_master.public_ip}\n\n[Worker_Node]\n${aws_instance.k8s_worker.public_ip}"
     filename    = "inventory"
   }
+
+output "master_ip" {
+  value = aws_instance.k8s_master.private_ip
+}
