@@ -4,6 +4,18 @@
     name: docker.io
     state: present
 
+- name: Add Kubernetes APT key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Kubernetes APT repo
+  become: true
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+
 - name: Install kubeadm, kubelet, and kubectl
   become: true
   apt:
@@ -16,6 +28,4 @@
 
 - name: Initialize Kubernetes Master
   become: true
-  command: 
-    - kubeadm init --pod-network-cidr=10.244.0.0/16 | tee kubeadm_join_command.txt
-    - cat kubeadm_join_command.txt
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16"

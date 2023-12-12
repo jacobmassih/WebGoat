@@ -75,6 +75,13 @@ resource "aws_security_group" "allow_ssh_http" {
     protocol         = -1
     cidr_blocks      = [ "0.0.0.0/0" ]
   }
+  ingress {
+    description      = "Allow All"
+    from_port        = 0
+    to_port          = 0
+    protocol         = -1
+    cidr_blocks      = [ "0.0.0.0/0" ]
+  }
   egress {
     from_port        = 0
     to_port          = 0
@@ -106,6 +113,7 @@ resource "aws_instance" "k8s_worker" {
   depends_on = [ aws_instance.k8s_master ]
   ami           = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
+  subnet_id = aws_subnet.public_subnet.id
   instance_type = "m4.large"
   key_name = aws_key_pair.terraformkey.key_name
   root_block_device {
@@ -117,12 +125,3 @@ resource "aws_instance" "k8s_worker" {
   } 
 }
 
-resource "local_file" "ansible_host" {
-    depends_on = [ aws_instance.k8s_worker ]
-    content     = "[Master_Node]\n${aws_instance.k8s_master.public_ip}\n\n[Worker_Node]\n${aws_instance.k8s_worker.public_ip}"
-    filename    = "inventory"
-  }
-
-output "master_ip" {
-  value = aws_instance.k8s_master.private_ip
-}
