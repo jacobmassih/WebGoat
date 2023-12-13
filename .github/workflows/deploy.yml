@@ -66,6 +66,7 @@ jobs:
                     tags: ${{ secrets.DOCKERHUB_REPOSITORY }}
 
     sonarqube:
+        needs: [build,docker-build-push]
         name: SonarQube Trigger
         runs-on: ubuntu-latest
         steps:
