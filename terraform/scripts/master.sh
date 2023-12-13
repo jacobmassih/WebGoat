@@ -1,8 +1,8 @@
 #!/bin/bash
 
-sudo hostnamectl set-hostname master
+# sudo hostnamectl set-hostname master
 
-# sudo apt-get update
+sudo apt-get update
 
 # # Install and start docker
 # sudo apt-get install docker.io -y

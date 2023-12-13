@@ -4,6 +4,18 @@
     name: docker.io
     state: present
 
+- name: Add Kubernetes APT key
+  become: true
+  apt_key:
+    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+    state: present
+
+- name: Add Kubernetes APT repo
+  become: true
+  apt_repository:
+    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+    state: present
+
 - name: Install kubeadm, kubelet, and kubectl
   become: true
   apt:
@@ -13,7 +25,18 @@
     - kubeadm
     - kubelet
     - kubectl
+- name: Generate join token
+  shell: kubeadm token create --print-join-command
+  register: kubeadm_join_cmd
+  delegate_to: "{{ groups['Master_Node'][0] }}"
 
-- name: Join Kubernetes Cluster
-  become: true
-  command: "kubeadm join <master_ip>:<master_port> --token <your_token> --discovery-token-ca-cert-hash sha256:<your_hash>"
+- set_fact:
+    kubeadm_join: "{{ kubeadm_join_cmd.stdout }}"
+
+- debug: var=kubeadm_join
+
+- name: Store join command
+  action: copy content="{{ kubeadm_join }}" dest="/etc/kubernetes/kubeadm-join.command"
+
+- name: Run kubeadm join
+  shell: "{{ kubeadm_join }} --ignore-preflight-errors=swap"
