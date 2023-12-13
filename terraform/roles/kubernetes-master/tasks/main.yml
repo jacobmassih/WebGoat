@@ -26,19 +26,20 @@
     - kubelet
     - kubectl
 
-# - name: Copy k8s.conf file to master
-#   copy:
-#     src: k8s.conf
-#     dest: "{{ kubernetes_config }}"
-#   register: result
+- name: Copy k8s.conf file to master
+  copy:
+    src: k8s.conf
+    dest: "{{ kubernetes_config }}"
+  register: result
 
 - name: Load settings from all system configuration files
   shell:
     cmd: sysctl --system
-  # when: result.changed
+  when: result.changed
 
 - name: Initialize Kubernetes Master
   command: "kubeadm init --pod-network-cidr=10.244.0.0/16"
+  when: result.changed
 
 - name: Create folder for kube
   file:
