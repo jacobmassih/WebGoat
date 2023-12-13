@@ -1,6 +1,6 @@
 #!/bin/bash
 
-sudo hostnamectl set-hostname worker
+# sudo hostnamectl set-hostname worker
 
 sudo apt-get update
 

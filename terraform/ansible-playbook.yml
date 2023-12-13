@@ -1,6 +1,6 @@
 - name: Install Kubernetes Master
   hosts: Master_Node
-  become: true
+  remote_user: ubuntu
   roles:
     - kubernetes-master
 

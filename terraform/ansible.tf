@@ -11,7 +11,7 @@ resource "null_resource" "null1" {
       local_file.ansible_host
     ]
   provisioner "local-exec" {
-    command = "sleep 30"
+    command = "sleep 10"
     }
   provisioner "local-exec" {
     command = "ansible-playbook ansible-playbook.yml"
