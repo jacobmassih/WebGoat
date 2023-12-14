@@ -157,7 +157,7 @@ jobs:
                 #echo "::set-output name=trivy_exit_code::${?}"
         
         -   name: Notify Slack
-            if: steps.trivy-cmd.exitcode != 0
+            if: failure()
             env:
                 SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             run: |
