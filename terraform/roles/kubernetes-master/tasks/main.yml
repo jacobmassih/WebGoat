@@ -77,18 +77,28 @@
   command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 
-    # -   name: Add Kubernetes YUM repository
-    #     shell: >
-    #       cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
-    #       [kubernetes]
-    #       name=Kubernetes
-    #       baseurl=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
-    #       enabled=1
-    #       gpgcheck=1
-    #       gpgkey=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
-    #       exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
-    #       EOF
-    #     args:
-    #       creates: /etc/yum.repos.d/kubernetes.repo
+# - name: Set up Docker repository and install Docker
+#   become: true
+#   vars:
+#     docker_repo_path: "/etc/yum.repos.d/docker-ce.repo"
+#   tasks:
+#     - name: Create Docker repository configuration
+#       ini_file:
+#         path: "{{ docker_repo_path }}"
+#         state: present
+#         section: 'docker-ce-stable'
+#         option: 'baseurl'
+#         value: 'https://download.docker.com/linux/centos/8/$basearch/stable'
+#         backup: yes
+
+#     - name: Add GPG key for Docker repository
+#       rpm_key:
+#         key: "https://download.docker.com/linux/centos/gpg"
+#         state: present
+
+#     - name: Install Docker
+#       dnf:
+#         name: docker-ce
+#         state: present
 
           
