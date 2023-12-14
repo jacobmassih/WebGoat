@@ -80,8 +80,8 @@
 # - hosts: k8s_master
 #   become: true
 #   tasks:
-#     - name: Add Kubernetes DNF repository
-#       dnf_repository:
+#     - name: Add Kubernetes YUM repository
+#       community.general.yum_repository:
 #         name: kubernetes
 #         baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el8-\$basearch
 #         enabled: yes
@@ -90,14 +90,4 @@
 #         gpgkey: 
 #           - https://packages.cloud.google.com/yum/doc/yum-key.gpg
 #           - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-#         description: "DNF repository for Kubernetes"
-
-#     - name: Install required packages
-#       dnf:
-#         name: "{{ item }}"
-#         state: present
-#       loop:
-#         - docker
-#         - kubelet
-#         - kubeadm
-#         - kubectl
+#         description: "YUM repository for Kubernetes"
