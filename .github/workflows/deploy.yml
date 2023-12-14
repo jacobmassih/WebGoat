@@ -151,21 +151,31 @@ jobs:
 
         -   name: Scan Docker image with Trivy
             continue-on-error: true
+            id: trivy-cmd
             run: |
                 trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
                 echo "::set-output name=trivy_exit_code::${?}"
+        
+        -   name: Notify Slack
+            if: steps.trivy-cmd.exitcode != 0
+            env:
+                SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+            run: |
+                curl -X POST -H "Content-type: application/json" --data '{
+                "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
+                }' $SLACK_WEBHOOK
 
-
-    notify-slack:
-        needs: trivy-scan
-        runs-on: ubuntu-latest
+    # notify-slack:
+    #     needs: trivy-scan
+    #     runs-on: ubuntu-latest
     
-        steps:
-            -   name: Notify Slack
-                env:
-                    SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-                run: |
-                    curl -X POST -H "Content-type: application/json" --data '{
-                    "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
-                    }' $SLACK_WEBHOOK
+    #     steps:
+    #         -   name: Notify Slack
+    #             if: steps.trivy-scan.outputs.trivy_exit_code != 0
+    #             env:
+    #                 SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+    #             run: |
+    #                 curl -X POST -H "Content-type: application/json" --data '{
+    #                 "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
+    #                 }' $SLACK_WEBHOOK
 
