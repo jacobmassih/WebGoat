@@ -154,21 +154,21 @@ jobs:
             run: |
                 trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
                 exitcode="$?"
-                echo "exitcode=$exitcode" >> $GITHUB_OUTPUT
+                echo "exitcode=$exitcode" >> $GITHUB_ENV
                 exit "$exitcode"
 
 
     notify-slack:
         needs: trivy-scan
         runs-on: ubuntu-latest
-        if: $GITHUB_OUTPUT != 0 
+        if: success(needs.trivy-scan.outputs['exitcode']) == 'false'
     
         steps:
-            - name: Notify Slack
-            env:
-                SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-            run: |
-                curl -X POST -H "Content-type: application/json" --data '{
-                "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
-                }' $SLACK_WEBHOOK
+            -   name: Notify Slack
+                env:
+                    SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+                run: |
+                    curl -X POST -H "Content-type: application/json" --data '{
+                    "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
+                    }' $SLACK_WEBHOOK
 
