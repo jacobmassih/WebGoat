@@ -80,11 +80,18 @@ jobs:
                 unzip tflint_linux_amd64.zip
                 sudo mv tflint /usr/local/bin/tflint
                 tflint --version
-
+        -   name: Install Terrascan
+            run: |
+                wget https://github.com/accurics/terrascan/releases/download/v1.13.1/terrascan_1.13.1_Linux_x86_64.tar.gz
+                tar -xzf terrascan_1.13.1_Linux_x86_64.tar.gz
+                sudo mv terrascan /usr/local/bin/
         -   name: Run TFLint
             run: tflint ./terraform
         
         -   name: Format Terraform code
             run: terraform fmt
+    
+        -   name: Run Terrascan
+            run: terrascan -d ./terraform
 
 
