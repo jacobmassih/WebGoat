@@ -27,7 +27,7 @@
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
 
-- name: Install kubeadm, kubelet, kubectl and iproute-tc
+- name: Install kubeadm, kubelet, kubectl and iproute2
   become: true
   apt:
       name: "{{ item }}"
@@ -36,7 +36,7 @@
       - kubeadm
       - kubelet
       - kubectl
-      - iproute-tc
+      - iproute2
 
 - name: Copy k8s.conf file to master
   copy:
