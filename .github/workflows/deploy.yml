@@ -140,21 +140,18 @@ jobs:
             run: terraform apply -auto-approve
 
 
-    sonarqube:
-        needs: [build,docker-build-push]
-        name: SonarQube Trigger
+    sonarcloud:
         runs-on: ubuntu-latest
         steps:
-        - name: Checking out
-          uses: actions/checkout@v3
-          with:
+        - uses: actions/checkout@v3
+         with:
             # Disabling shallow clone is recommended for improving relevancy of reporting
             fetch-depth: 0
-        - name: SonarQube Scan
-          uses: kitabisa/sonarqube-action@v1.2.0
-          with:
-            host: ${{ secrets.SONARQUBE_HOST }}
-            login: ${{ secrets.SONARQUBE_TOKEN }}
+        - name: SonarCloud Scan
+          uses: sonarsource/sonarcloud-github-action@master
+          env:
+            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
                     
     zap_scan:
