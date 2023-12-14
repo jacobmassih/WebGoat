@@ -14,7 +14,7 @@ resource "null_resource" "null1" {
     command = "sleep 10"
   }
   provisioner "local-exec" {
-    command = "ansible-playbook ansible-playbook.yml"
+    command =      "ansible-playbook ansible-playbook.yml"
   }
 }
 # Print K8s Master and Worker node IP
