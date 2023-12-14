@@ -85,14 +85,21 @@ jobs:
                 wget https://github.com/accurics/terrascan/releases/download/v1.13.1/terrascan_1.13.1_Linux_x86_64.tar.gz
                 tar -xzf terrascan_1.13.1_Linux_x86_64.tar.gz
                 sudo mv terrascan /usr/local/bin/
+
+        -   name: Install Checkov
+            run: pip install checkov
+
         -   name: Run TFLint
             run: tflint ./terraform
         
         -   name: Format Terraform code
-            run: terraform fmt
+            run: terraform fmt -recursive
     
         -   name: Run Terrascan
             continue-on-error: true
             run: terrascan scan -d ./terraform
+
+        -   name: Run Checkov
+            run: checkov --directory=./terraform
 
 
