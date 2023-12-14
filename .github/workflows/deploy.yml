@@ -142,7 +142,7 @@ jobs:
 
 
     trivy-scan:
-        needs: docker-build-push
+        #needs: docker-build-push
         runs-on: ubuntu-latest
         steps:
         -   name: Install Trivy
