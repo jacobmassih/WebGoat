@@ -27,36 +27,16 @@
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
 
-- name: Install kubelet, kubectl, kubeadm and iproute2
+- name: Install kubeadm, kubelet, kubectl and iproute2
   become: true
   apt:
       name: "{{ item }}"
       state: present
   loop:
+      - kubeadm
       - kubelet
       - kubectl
-      - kubeadm
       - iproute2
-
-- name: Start and enable kubelet
-  service:
-    name: "{{ item }}"
-    state: started
-    enabled: yes
-  loop:
-      - kubelet
-  register: svc_start
-
-- name: Copy k8s.conf file to worker
-  copy:
-    src: k8s.conf
-    dest: "{{ kubernetes_config }}"
-  register: result
-
-- name: Load settings from all system configuration files
-  shell:
-      cmd: sysctl --system
-  when: result.changed
 
 - name: Generate join token
   shell: kubeadm token create --print-join-command
@@ -73,4 +53,3 @@
 
 - name: Run kubeadm join
   shell: "{{ kubeadm_join }} --ignore-preflight-errors=swap"
-  when: result.changed
