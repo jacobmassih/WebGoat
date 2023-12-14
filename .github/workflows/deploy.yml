@@ -82,7 +82,9 @@ jobs:
                 tflint --version
 
         -   name: Run TFLint
-            run: | 
-                tflint ./terraform
-                echo "Current directory: $(pwd)"
+            run: tflint ./terraform
+        
+        -   name: Format Terraform code
+            run: terraform fmt -check -recursive
+
 
