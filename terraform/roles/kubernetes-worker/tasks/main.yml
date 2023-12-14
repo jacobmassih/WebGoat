@@ -1,27 +1,51 @@
+- name: Disabling Swap on all nodes
+  become: true
+  shell: swapoff -a
+
+- name: Commenting Swap entries in /etc/fstab
+  become: true
+  replace:
+      path: /etc/fstab
+      regexp: "(^/.*swap*)"
+      replace: '# \1'
+
 - name: Install Docker
   become: true
   apt:
-    name: docker.io
-    state: present
+      name: docker.io
+      state: present
 
 - name: Add Kubernetes APT key
   become: true
   apt_key:
+<<<<<<< HEAD
     url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
     state: present
+=======
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
+>>>>>>> origin/main
 
 - name: Add Kubernetes APT repo
   become: true
   apt_repository:
+<<<<<<< HEAD
     repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
     state: present
 
 - name: Install kubeadm, kubelet, and kubectl
+=======
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
+
+- name: Install kubeadm, kubelet, kubectl and iproute2
+>>>>>>> origin/main
   become: true
   apt:
-    name: "{{ item }}"
-    state: present
+      name: "{{ item }}"
+      state: present
   loop:
+<<<<<<< HEAD
     - kubeadm
     - kubelet
     - kubectl
@@ -32,6 +56,20 @@
 
 - set_fact:
     kubeadm_join: "{{ kubeadm_join_cmd.stdout }}"
+=======
+      - kubeadm
+      - kubelet
+      - kubectl
+      - iproute2
+
+- name: Generate join token
+  shell: kubeadm token create --print-join-command
+  register: kubeadm_join_cmd
+  delegate_to: "{{ groups['Master_Node'][0] }}"
+
+- set_fact:
+      kubeadm_join: "{{ kubeadm_join_cmd.stdout }}"
+>>>>>>> origin/main
 
 - debug: var=kubeadm_join
 

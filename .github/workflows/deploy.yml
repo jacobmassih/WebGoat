@@ -65,6 +65,81 @@ jobs:
                     push: true
                     tags: ${{ secrets.DOCKERHUB_REPOSITORY }}
 
+    lint_terraform:
+        runs-on: ubuntu-latest
+        steps:
+        -   name: Checkout code
+            uses: actions/checkout@v2
+            
+        -   name: Set up Terraform
+            uses: hashicorp/setup-terraform@v1
+
+        -   name: Install TFLint
+            run: |
+                wget https://github.com/terraform-linters/tflint/releases/download/v0.29.1/tflint_linux_amd64.zip
+                unzip tflint_linux_amd64.zip
+                sudo mv tflint /usr/local/bin/tflint
+                tflint --version
+        -   name: Install Terrascan
+            run: |
+                wget https://github.com/accurics/terrascan/releases/download/v1.13.1/terrascan_1.13.1_Linux_x86_64.tar.gz
+                tar -xzf terrascan_1.13.1_Linux_x86_64.tar.gz
+                sudo mv terrascan /usr/local/bin/
+
+        -   name: Install Checkov
+            run: pip install checkov
+
+        -   name: Run TFLint
+            run: tflint ./terraform
+        
+        -   name: Format Terraform code
+            run: terraform fmt -recursive
+    
+        -   name: Run Terrascan
+            continue-on-error: true
+            run: terrascan scan -d ./terraform
+
+        -   name: Run Checkov
+            continue-on-error: true
+            run: checkov --directory=./terraform
+
+    build_infrastructure:
+        runs-on: ubuntu-latest
+        # if: github.event_name == 'pull_request'
+        defaults:
+            run:
+                shell: bash
+                working-directory: terraform/
+            
+        steps:
+        -   name: Checkout code
+            uses: actions/checkout@v2       
+    
+        -   name: Set up Terraform
+            uses: hashicorp/setup-terraform@v1
+
+        -   name: Install Ansible
+            run: |
+                sudo apt-get update
+                sudo apt-get install -y ansible
+
+        -   name: Set up AWS CLI with credentials
+            run: |
+                aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
+                aws configure set region us-east-1
+            
+        -   name: Initialize Terraform
+            run: terraform init  
+
+        -   name: Destroying previous infrastructure
+            run: terraform destroy -auto-approve        
+
+        -   name: Apply Terraform Changes
+            run: terraform apply -auto-approve
+
+
     sonarqube:
         needs: [build,docker-build-push]
         name: SonarQube Trigger

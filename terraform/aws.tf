@@ -98,7 +98,11 @@ resource "aws_security_group" "allow_ssh_http" {
 resource "aws_instance" "k8s_master" {
   ami                         = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids      = [aws_security_group.allow_ssh_http.id]
+<<<<<<< HEAD
   instance_type               = "t2.medium"
+=======
+  instance_type               = "m5.2xlarge"
+>>>>>>> origin/main
   key_name                    = aws_key_pair.terraformkey.key_name
   user_data                   = file("scripts/master.sh") # used to run script which deploys docker container on each instance
   associate_public_ip_address = true
@@ -117,7 +121,11 @@ resource "aws_instance" "k8s_worker" {
   ami                    = "ami-0fc5d935ebf8bc3bc"
   vpc_security_group_ids = [aws_security_group.allow_ssh_http.id]
   subnet_id              = aws_subnet.public_subnet.id
+<<<<<<< HEAD
   instance_type          = "t2.medium"
+=======
+  instance_type          = "m5.2xlarge"
+>>>>>>> origin/main
   key_name               = aws_key_pair.terraformkey.key_name
   root_block_device {
     volume_size = 30
