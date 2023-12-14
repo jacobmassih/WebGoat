@@ -105,6 +105,7 @@ jobs:
 
     build_infrastructure:
         runs-on: ubuntu-latest
+        # if: github.event_name == 'pull_request'
         defaults:
             run:
                 shell: bash
@@ -130,7 +131,10 @@ jobs:
                 aws configure set region us-east-1
             
         -   name: Initialize Terraform
-            run: terraform init        
+            run: terraform init  
+
+        -   name: Destroying previous infrastructure
+            run: terraform destroy -auto-approve        
 
         -   name: Apply Terraform Changes
             run: terraform apply -auto-approve
