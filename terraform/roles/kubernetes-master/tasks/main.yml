@@ -1,64 +1,75 @@
+- name: Disabling Swap on all nodes
+  become: true
+  shell: swapoff -a
+
+- name: Commenting Swap entries in /etc/fstab
+  become: true
+  replace:
+      path: /etc/fstab
+      regexp: "(^/.*swap*)"
+      replace: '# \1'
+
 - name: Install Docker
   become: true
   apt:
-    name: docker.io
-    state: present
+      name: docker.io
+      state: present
 
 - name: Add Kubernetes APT key
   become: true
   apt_key:
-    url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-    state: present
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
 
 - name: Add Kubernetes APT repo
   become: true
   apt_repository:
-    repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-    state: present
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
 
 - name: Install kubeadm, kubelet, and kubectl
   become: true
   apt:
-    name: "{{ item }}"
-    state: present
+      name: "{{ item }}"
+      state: present
   loop:
-    - kubeadm
-    - kubelet
-    - kubectl
+      - kubeadm
+      - kubelet
+      - kubectl
 
 - name: Copy k8s.conf file to master
   copy:
-    src: k8s.conf
-    dest: "{{ kubernetes_config }}"
+      src: k8s.conf
+      dest: "{{ kubernetes_config }}"
   register: result
 
 - name: Load settings from all system configuration files
   shell:
-    cmd: sysctl --system
+      cmd: sysctl --system
   when: result.changed
 
 - name: Initialize Kubernetes Master
   command: "kubeadm init --pod-network-cidr=10.244.0.0/16"
   when: result.changed
 
+- name: wait
+  wait_for:
+      timeout: 120
+
 - name: Create folder for kube
   file:
-    path: $HOME/.kube
-    state: directory
+      path: $HOME/.kube
+      state: directory
   register: kube_dir
 
 - name: Copy admin.conf file to kube
   copy:
-    src: "/etc/kubernetes/admin.conf"
-    dest: "$HOME/.kube/config"
-    owner: "{{ kube_dir.owner }}"
-    group: "{{ kube_dir.group }}"
-    remote_src: yes
+      src: "/etc/kubernetes/admin.conf"
+      dest: "$HOME/.kube/config"
+      owner: "{{ kube_dir.owner }}"
+      group: "{{ kube_dir.group }}"
+      remote_src: yes
   when: kube_dir.changed
-
-- name: wait
-  wait_for:
-    timeout: 30
 
 - name: Setup flannel network
   become: true
