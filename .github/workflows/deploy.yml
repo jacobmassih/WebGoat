@@ -154,10 +154,13 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
 
-                    
+
     zap_scan:
         #needs: [build,docker-build-push]
         runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            issues: write
         name: Scan the web application
         steps:
         - name: Checkout
@@ -168,9 +171,9 @@ jobs:
           uses: zaproxy/action-full-scan@v0.8.0
           with:
             token: ${{ secrets.GITHUB_TOKEN }}
-            target: 'https://lf2.net/'
+            target: 'https://juice-shop.herokuapp.com'
             rules_file_name: '.zap/rules.tsv'
             cmd_options: '-a'
-
+          
 
         
