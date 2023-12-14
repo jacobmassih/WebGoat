@@ -142,7 +142,7 @@ jobs:
 
 
     trivy-scan:
-        #needs: docker-build-push
+        needs: docker-build-push
         runs-on: ubuntu-latest
         steps:
         -   name: Install Trivy
@@ -164,18 +164,3 @@ jobs:
                 curl -X POST -H "Content-type: application/json" --data '{
                 "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
                 }' $SLACK_WEBHOOK
-
-    # notify-slack:
-    #     needs: trivy-scan
-    #     runs-on: ubuntu-latest
-    
-    #     steps:
-    #         -   name: Notify Slack
-    #             if: steps.trivy-scan.outputs.trivy_exit_code != 0
-    #             env:
-    #                 SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-    #             run: |
-    #                 curl -X POST -H "Content-type: application/json" --data '{
-    #                 "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
-    #                 }' $SLACK_WEBHOOK
-
