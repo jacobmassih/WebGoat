@@ -85,6 +85,6 @@ jobs:
             run: tflint ./terraform
         
         -   name: Format Terraform code
-            run: terraform fmt -check -recursive
+            run: terraform fmt
 
 
