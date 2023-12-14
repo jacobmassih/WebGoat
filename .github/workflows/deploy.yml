@@ -153,18 +153,16 @@ jobs:
             continue-on-error: true
             run: |
                 trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
-                exitcode="$?"
-                echo "exitcode=$exitcode" >> $GITHUB_ENV
-                exit "$exitcode"
+                echo "::set-output name=trivy_exit_code::${?}"
 
 
     notify-slack:
         needs: trivy-scan
         runs-on: ubuntu-latest
-        if: success(needs.trivy-scan.outputs['exitcode']) == 'false'
     
         steps:
             -   name: Notify Slack
+                if: steps.trivy.outputs.trivy_exit_code != 0
                 env:
                     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
                 run: |
