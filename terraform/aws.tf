@@ -100,7 +100,7 @@ resource "aws_instance" "k8s_master" {
   vpc_security_group_ids      = [aws_security_group.allow_ssh_http.id]
   instance_type               = "m5.2xlarge"
   key_name                    = aws_key_pair.terraformkey.key_name
-  user_data                   = file("scripts/master.sh") # used to run script which deploys docker container on each instance
+  user_data                   = file("scripts/master.sh")
   associate_public_ip_address = true
   subnet_id                   = aws_subnet.public_subnet.id
   root_block_device {
@@ -122,7 +122,7 @@ resource "aws_instance" "k8s_worker" {
   root_block_device {
     volume_size = 30
   }
-  user_data = file("scripts/worker.sh") # used to run script which deploys docker container on each instance
+  user_data = file("scripts/worker.sh")
   tags = {
     Name = "k8s-worker"
   }

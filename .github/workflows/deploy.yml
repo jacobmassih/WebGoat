@@ -1,4 +1,4 @@
-name: "Pull requests build"
+name: "push build"
 
 on:
     push:
