@@ -156,12 +156,11 @@ jobs:
 
 
     zap_scan:
-        #needs: [build,docker-build-push]
+        needs: sonarcloud
         runs-on: ubuntu-latest
         permissions:
             contents: read
             issues: write
-        name: Scan the web application
         steps:
         - name: Checkout
           uses: actions/checkout@v3
