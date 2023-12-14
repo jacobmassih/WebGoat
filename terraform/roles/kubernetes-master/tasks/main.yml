@@ -77,17 +77,18 @@
   command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 
-# - hosts: k8s_master
-#   become: true
-#   tasks:
-#     - name: Add Kubernetes YUM repository
-#       community.general.yum_repository:
-#         name: kubernetes
-#         baseurl: https://packages.cloud.google.com/yum/repos/kubernetes-el8-\$basearch
-#         enabled: yes
-#         gpgcheck: yes
-#         repo_gpgcheck: yes
-#         gpgkey: 
-#           - https://packages.cloud.google.com/yum/doc/yum-key.gpg
-#           - https://packages.cloud.google.com/yum/doc/rpm-package-key.gpg
-#         description: "YUM repository for Kubernetes"
+    # -   name: Add Kubernetes YUM repository
+    #     shell: >
+    #       cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
+    #       [kubernetes]
+    #       name=Kubernetes
+    #       baseurl=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/
+    #       enabled=1
+    #       gpgcheck=1
+    #       gpgkey=https://pkgs.k8s.io/core:/stable:/v1.28/rpm/repodata/repomd.xml.key
+    #       exclude=kubelet kubeadm kubectl cri-tools kubernetes-cni
+    #       EOF
+    #     args:
+    #       creates: /etc/yum.repos.d/kubernetes.repo
+
+          
