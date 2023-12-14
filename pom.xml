@@ -475,7 +475,8 @@
           <excludeDevtools>true</excludeDevtools>
           <executable>true</executable>
           <mainClass>org.owasp.webgoat.server.StartWebGoat</mainClass>
-          <!-- See http://docs.spring.io/spring-boot/docs/current/reference/html/howto-build.html#howto-extract-specific-libraries-when-an-executable-jar-runs -->
+          <!-- See
+          http://docs.spring.io/spring-boot/docs/current/reference/html/howto-build.html#howto-extract-specific-libraries-when-an-executable-jar-runs -->
           <requiresUnpack>
             <dependency>
               <groupId>org.asciidoctor</groupId>
@@ -516,7 +517,8 @@
           <systemPropertyVariables>
             <logback.configurationFile>${basedir}/src/test/resources/logback-test.xml</logback.configurationFile>
           </systemPropertyVariables>
-          <argLine>-Xmx512m -Dwebgoatport=${webgoat.port} -Dwebwolfport=${webwolf.port} -Dwebwolfcontext=${webwolf.context} -Dwebgoatcontext=${webgoat.context}</argLine>
+          <argLine>-Xmx512m -Dwebgoatport=${webgoat.port} -Dwebwolfport=${webwolf.port}
+            -Dwebwolfcontext=${webwolf.context} -Dwebgoatcontext=${webgoat.context}</argLine>
           <includes>org/owasp/webgoat/*Test</includes>
         </configuration>
         <executions>
@@ -540,11 +542,14 @@
         <version>${maven-surefire-plugin.version}</version>
         <configuration>
           <forkedProcessTimeoutInSeconds>600</forkedProcessTimeoutInSeconds>
-          <argLine>--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
-          --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
-          --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED
-          --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED
-          --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</argLine>
+          <argLine>--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens
+            java.base/java.io=ALL-UNNAMED
+            --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
+            --add-opens java.base/java.util=ALL-UNNAMED --add-opens
+            java.base/java.lang.reflect=ALL-UNNAMED
+            --add-opens java.base/java.text=ALL-UNNAMED --add-opens
+            java.desktop/java.awt.font=ALL-UNNAMED
+            --add-opens=java.base/sun.nio.ch=ALL-UNNAMED --add-opens=java.base/java.io=ALL-UNNAMED</argLine>
           <excludes>
             <exclude>**/*IntegrationTest.java</exclude>
             <exclude>src/it/java</exclude>
@@ -773,7 +778,8 @@
               <skipProvidedScope>false</skipProvidedScope>
               <skipRuntimeScope>false</skipRuntimeScope>
               <suppressionFiles>
-                <!--suppress UnresolvedMavenProperty -->
+                <!--suppress
+                UnresolvedMavenProperty -->
                 <suppressionFile>${maven.multiModuleProjectDirectory}/config/dependency-check/project-suppression.xml</suppressionFile>
               </suppressionFiles>
             </configuration>
@@ -801,11 +807,15 @@
             <artifactId>maven-surefire-plugin</artifactId>
             <version>${maven-surefire-plugin.version}</version>
             <configuration>
-              <argLine>--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
-          --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens java.base/java.io=ALL-UNNAMED
-          --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang.reflect=ALL-UNNAMED
-          --add-opens java.base/java.text=ALL-UNNAMED --add-opens java.desktop/java.awt.font=ALL-UNNAMED
-          ${surefire.jacoco.args}</argLine>
+              <argLine>--add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens
+                java.base/java.io=ALL-UNNAMED
+                --add-opens java.base/sun.nio.ch=ALL-UNNAMED --add-opens
+                java.base/java.io=ALL-UNNAMED
+                --add-opens java.base/java.util=ALL-UNNAMED --add-opens
+                java.base/java.lang.reflect=ALL-UNNAMED
+                --add-opens java.base/java.text=ALL-UNNAMED --add-opens
+                java.desktop/java.awt.font=ALL-UNNAMED
+                ${surefire.jacoco.args}</argLine>
               <excludes>
                 <exclude>**/*IntegrationTest.java</exclude>
                 <exclude>src/it/java</exclude>
