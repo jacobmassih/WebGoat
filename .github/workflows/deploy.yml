@@ -156,7 +156,7 @@ jobs:
 
                     
     zap_scan:
-        needs: [build,docker-build-push]
+        #needs: [build,docker-build-push]
         runs-on: ubuntu-latest
         name: Scan the web application
         steps:
