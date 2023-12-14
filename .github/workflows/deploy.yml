@@ -140,3 +140,14 @@ jobs:
             run: terraform apply -auto-approve
 
 
+    trivy_scan:
+        runs-on: ubuntu-latest
+        steps:
+        -   name: Install Trivy
+            run: |
+                wget https://github.com/aquasecurity/trivy/releases/download/v0.19.2/trivy_0.19.2_Linux-64bit.deb
+                sudo dpkg -i trivy_0.19.2_Linux-64bit.deb
+
+        -   name: Scan Docker image with Trivy
+            run: trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
+
