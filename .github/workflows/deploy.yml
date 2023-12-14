@@ -104,6 +104,7 @@ jobs:
               run: checkov --directory=./terraform
 
     build-infrastructure:
+        needs: lint-terraform
         runs-on: ubuntu-latest
         if: github.event_name == 'pull_request'
         defaults:
@@ -164,6 +165,7 @@ jobs:
                   }' $SLACK_WEBHOOK
 
     zap_scan:
+        needs: build-infrastructure
         runs-on: ubuntu-latest
         permissions:
             contents: read
