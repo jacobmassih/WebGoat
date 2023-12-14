@@ -116,6 +116,7 @@ jobs:
             run: |
                 sudo apt-get update
                 sudo apt-get install -y ansible
+                cd ./terraform
 
         -   name: Configure AWS credentials
             run: |
@@ -123,9 +124,9 @@ jobs:
               echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
 
         -   name: Initialize Terraform
-            run: terraform init ./terraform         
+            run: terraform init        
 
         -   name: Apply Terraform Changes
-            run: terraform apply -auto-approve ./terraform
+            run: terraform apply -auto-approve
 
 
