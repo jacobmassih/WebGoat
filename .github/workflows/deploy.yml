@@ -83,6 +83,6 @@ jobs:
 
         -   name: Run TFLint
             run: | 
-                tflint ./WebGoat/terraform
+                tflint ./terraform
                 echo "Current directory: $(pwd)"
 
