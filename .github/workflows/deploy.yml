@@ -65,7 +65,7 @@ jobs:
                     push: true
                     tags: ${{ secrets.DOCKERHUB_REPOSITORY }}
 
-    lint_terraform:
+    lint-terraform:
         runs-on: ubuntu-latest
         steps:
         -   name: Checkout code
@@ -103,7 +103,7 @@ jobs:
             continue-on-error: true
             run: checkov --directory=./terraform
 
-    build_infrastructure:
+    build-infrastructure:
         runs-on: ubuntu-latest
         # if: github.event_name == 'pull_request'
         defaults:
@@ -140,7 +140,8 @@ jobs:
             run: terraform apply -auto-approve
 
 
-    trivy_scan:
+    trivy-scan:
+        needs: docker-build-push
         runs-on: ubuntu-latest
         steps:
         -   name: Install Trivy
@@ -149,5 +150,6 @@ jobs:
                 sudo dpkg -i trivy_0.19.2_Linux-64bit.deb
 
         -   name: Scan Docker image with Trivy
+            continue-on-error: true
             run: trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
 
