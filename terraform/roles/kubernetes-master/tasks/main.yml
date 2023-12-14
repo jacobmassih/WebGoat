@@ -77,28 +77,17 @@
   command: kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/master/Documentation/kube-flannel.yml
 
 
-# - name: Set up Docker repository and install Docker
-#   become: true
-#   vars:
-#     docker_repo_path: "/etc/yum.repos.d/docker-ce.repo"
-#   tasks:
-#     - name: Create Docker repository configuration
-#       ini_file:
-#         path: "{{ docker_repo_path }}"
-#         state: present
-#         section: 'docker-ce-stable'
-#         option: 'baseurl'
-#         value: 'https://download.docker.com/linux/centos/8/$basearch/stable'
-#         backup: yes
-
-#     - name: Add GPG key for Docker repository
-#       rpm_key:
-#         key: "https://download.docker.com/linux/centos/gpg"
-#         state: present
-
-#     - name: Install Docker
-#       dnf:
-#         name: docker-ce
-#         state: present
-
+    # - name: Add repository  
+    #   get_url:
+    #     url: https://download.docker.com/linux/centos/docker-ce.repo
+    #     dest: /etc/yum.repos.d/docker-ce.repo
+    # - name: Install Docker
+    #   yum: 
+    #     name: docker
+    #     state: latest
+    # - name: Start and enable
+    #   service: 
+    #     name: docker
+    #     state: started 
+    #     enabled: yes
           
