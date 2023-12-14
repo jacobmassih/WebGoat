@@ -162,7 +162,6 @@ jobs:
     
         steps:
             -   name: Notify Slack
-                if: steps.trivy.outputs.trivy_exit_code != 0
                 env:
                     SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
                 run: |
