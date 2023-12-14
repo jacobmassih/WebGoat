@@ -9,3 +9,10 @@
   become: true
   roles:
     - kubernetes-worker
+
+- name: Deploy WebGoat and other utilities
+  hosts: Master_Node
+  become: true
+  remote_user: ubuntu
+  roles:
+    - kubernetes-master-deploy
