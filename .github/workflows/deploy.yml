@@ -3,105 +3,105 @@ name: "Pull requests build"
 on:
     push:
         paths-ignore:
-            - '.txt'
-            - 'LICENSE'
-            - 'docs/**'
+            - ".txt"
+            - "LICENSE"
+            - "docs/**"
 
 jobs:
     build:
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v3
+            - uses: actions/checkout@v3
 
-            -   name: Set up JDK 17
-                uses: actions/setup-java@v3
-                with:
-                    distribution: 'temurin'
-                    java-version: 17
-                    architecture: x64
+            - name: Set up JDK 17
+              uses: actions/setup-java@v3
+              with:
+                  distribution: "temurin"
+                  java-version: 17
+                  architecture: x64
 
-            -   name: Cache Maven packages
-                uses: actions/cache@v3.3.1
-                with:
-                    path: ~/.m2
-                    key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-                    restore-keys: ${{ runner.os }}-m2-
+            - name: Cache Maven packages
+              uses: actions/cache@v3.3.1
+              with:
+                  path: ~/.m2
+                  key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
+                  restore-keys: ${{ runner.os }}-m2-
 
-            -   name: Build with Maven
-                run: mvn --no-transfer-progress verify
+            - name: Build with Maven
+              run: mvn --no-transfer-progress verify
 
-            -   uses: actions/upload-artifact@master
-                with:
-                    name: target
-                    path: target/
-    
+            - uses: actions/upload-artifact@master
+              with:
+                  name: target
+                  path: target/
+
     docker-build-push:
         needs: build
         runs-on: ubuntu-latest
         steps:
-            -   uses: actions/checkout@v3
+            - uses: actions/checkout@v3
 
-            -   uses: actions/download-artifact@master
-                with:
-                    name: target
-                    path: target/
+            - uses: actions/download-artifact@master
+              with:
+                  name: target
+                  path: target/
 
-            -   name: "Set up QEMU"
-                uses: docker/setup-qemu-action@v2.2.0
+            - name: "Set up QEMU"
+              uses: docker/setup-qemu-action@v2.2.0
 
-            -   name: "Set up Docker Buildx"
-                uses: docker/setup-buildx-action@v3
+            - name: "Set up Docker Buildx"
+              uses: docker/setup-buildx-action@v3
 
-            -   name: Login to Docker Hub
-                uses: docker/login-action@v3
-                with:
+            - name: Login to Docker Hub
+              uses: docker/login-action@v3
+              with:
                   username: ${{ secrets.DOCKERHUB_USERNAME_ID }}
                   password: ${{ secrets.DOCKERHUB_TOKEN_KEY }}
-        
-            -   name: Build and push Docker image
-                uses: docker/build-push-action@v5
-                with:
-                    context: .
-                    push: true
-                    tags: ${{ secrets.DOCKERHUB_REPOSITORY }}
+
+            - name: Build and push Docker image
+              uses: docker/build-push-action@v5
+              with:
+                  context: .
+                  push: true
+                  tags: ${{ secrets.DOCKERHUB_REPOSITORY }}
 
     lint-terraform:
         runs-on: ubuntu-latest
         steps:
-        -   name: Checkout code
-            uses: actions/checkout@v2
-            
-        -   name: Set up Terraform
-            uses: hashicorp/setup-terraform@v1
+            - name: Checkout code
+              uses: actions/checkout@v2
 
-        -   name: Install TFLint
-            run: |
-                wget https://github.com/terraform-linters/tflint/releases/download/v0.29.1/tflint_linux_amd64.zip
-                unzip tflint_linux_amd64.zip
-                sudo mv tflint /usr/local/bin/tflint
-                tflint --version
-        -   name: Install Terrascan
-            run: |
-                wget https://github.com/accurics/terrascan/releases/download/v1.13.1/terrascan_1.13.1_Linux_x86_64.tar.gz
-                tar -xzf terrascan_1.13.1_Linux_x86_64.tar.gz
-                sudo mv terrascan /usr/local/bin/
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v1
 
-        -   name: Install Checkov
-            run: pip install checkov
+            - name: Install TFLint
+              run: |
+                  wget https://github.com/terraform-linters/tflint/releases/download/v0.29.1/tflint_linux_amd64.zip
+                  unzip tflint_linux_amd64.zip
+                  sudo mv tflint /usr/local/bin/tflint
+                  tflint --version
+            - name: Install Terrascan
+              run: |
+                  wget https://github.com/accurics/terrascan/releases/download/v1.13.1/terrascan_1.13.1_Linux_x86_64.tar.gz
+                  tar -xzf terrascan_1.13.1_Linux_x86_64.tar.gz
+                  sudo mv terrascan /usr/local/bin/
 
-        -   name: Run TFLint
-            run: tflint ./terraform
-        
-        -   name: Format Terraform code
-            run: terraform fmt -recursive
-    
-        -   name: Run Terrascan
-            continue-on-error: true
-            run: terrascan scan -d ./terraform
+            - name: Install Checkov
+              run: pip install checkov
 
-        -   name: Run Checkov
-            continue-on-error: true
-            run: checkov --directory=./terraform
+            - name: Run TFLint
+              run: tflint ./terraform
+
+            - name: Format Terraform code
+              run: terraform fmt -recursive
+
+            - name: Run Terrascan
+              continue-on-error: true
+              run: terrascan scan -d ./terraform
+
+            - name: Run Checkov
+              continue-on-error: true
+              run: checkov --directory=./terraform
 
     build-infrastructure:
         runs-on: ubuntu-latest
@@ -110,56 +110,74 @@ jobs:
             run:
                 shell: bash
                 working-directory: terraform/
-            
+
         steps:
-        -   name: Checkout code
-            uses: actions/checkout@v2       
-    
-        -   name: Set up Terraform
-            uses: hashicorp/setup-terraform@v1
+            - name: Checkout code
+              uses: actions/checkout@v2
 
-        -   name: Install Ansible
-            run: |
-                sudo apt-get update
-                sudo apt-get install -y ansible
+            - name: Set up Terraform
+              uses: hashicorp/setup-terraform@v1
 
-        -   name: Set up AWS CLI with credentials
-            run: |
-                aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-                aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
-                aws configure set region us-east-1
-            
-        -   name: Initialize Terraform
-            run: terraform init  
+            - name: Install Ansible
+              run: |
+                  sudo apt-get update
+                  sudo apt-get install -y ansible
 
-        -   name: Destroying previous infrastructure
-            run: terraform destroy -auto-approve        
+            - name: Set up AWS CLI with credentials
+              run: |
+                  aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+                  aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                  aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
+                  aws configure set region us-east-1
 
-        -   name: Apply Terraform Changes
-            run: terraform apply -auto-approve
+            - name: Initialize Terraform
+              run: terraform init
 
+            - name: Destroying previous infrastructure
+              run: terraform destroy -auto-approve
+
+            - name: Apply Terraform Changes
+              run: terraform apply -auto-approve
 
     trivy-scan:
         needs: docker-build-push
         runs-on: ubuntu-latest
         steps:
-        -   name: Install Trivy
-            run: |
-                wget https://github.com/aquasecurity/trivy/releases/download/v0.19.2/trivy_0.19.2_Linux-64bit.deb
-                sudo dpkg -i trivy_0.19.2_Linux-64bit.deb
+            - name: Install Trivy
+              run: |
+                  wget https://github.com/aquasecurity/trivy/releases/download/v0.19.2/trivy_0.19.2_Linux-64bit.deb
+                  sudo dpkg -i trivy_0.19.2_Linux-64bit.deb
 
-        -   name: Scan Docker image with Trivy
-            continue-on-error: true
-            id: trivy-scan-cmd
-            run: |
-                trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
-        
-        -   name: Notify Slack
-            if: steps.trivy-scan-cmd.outcome == 'failure'
-            env:
-                SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
-            run: |
-                curl -X POST -H "Content-type: application/json" --data '{
-                "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
-                }' $SLACK_WEBHOOK
+            - name: Scan Docker image with Trivy
+              continue-on-error: true
+              id: trivy-scan-cmd
+              run: |
+                  trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
+
+            - name: Notify Slack
+              if: steps.trivy-scan-cmd.outcome == 'failure'
+              env:
+                  SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
+              run: |
+                  curl -X POST -H "Content-type: application/json" --data '{
+                  "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
+                  }' $SLACK_WEBHOOK
+
+    zap_scan:
+        runs-on: ubuntu-latest
+        permissions:
+            contents: read
+            issues: write
+        steps:
+            - name: Checkout
+              uses: actions/checkout@v3
+              with:
+                  ref: main
+
+            - name: ZAP Scan
+              uses: zaproxy/action-full-scan@v0.8.0
+              with:
+                  token: ${{ secrets.GITHUB_TOKEN }}
+                  target: "https://juice-shop.herokuapp.com"
+                  rules_file_name: ".zap/rules.tsv"
+                  cmd_options: "-a"
