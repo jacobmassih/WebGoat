@@ -82,5 +82,7 @@ jobs:
                 tflint --version
 
         -   name: Run TFLint
-            run: tflint ./terraform
+            run: | 
+                tflint ./WebGoat/terraform
+                echo "Current directory: $(pwd)"
 
