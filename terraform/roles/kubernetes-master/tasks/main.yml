@@ -27,16 +27,26 @@
       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
       state: present
 
-- name: Install kubeadm, kubelet, kubectl and iproute2
+- name: Install kubelet, kubectl, kubeadm and iproute2
   become: true
   apt:
       name: "{{ item }}"
       state: present
   loop:
-      - kubeadm
       - kubelet
       - kubectl
+      - kubeadm
       - iproute2
+
+- name: Start and enable kubelet
+  service:
+    name: "{{ item }}"
+    state: started
+    enabled: yes
+  loop:
+      - kubelet
+  register: svc_start
+
 
 - name: Copy k8s.conf file to master
   copy:
