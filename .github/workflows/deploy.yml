@@ -153,11 +153,12 @@ jobs:
         -   name: Scan Docker image with Trivy
             continue-on-error: true
             id: trivy-cmd
-            run: trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
-                #echo "::set-output name=trivy_exit_code::${?}"
+            run: |
+                trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
+                echo "::set-output name=trivy_exit_code::${?}"
         
         -   name: Notify Slack
-            if: failure()
+            if: steps.trivy-cmd.outputs.trivy_exit_code != '0'
             env:
                 SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
             run: |
