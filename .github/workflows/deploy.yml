@@ -121,12 +121,11 @@ jobs:
             run: |
               echo "AWS_ACCESS_KEY_ID=${{ secrets.AWS_ACCESS_KEY_ID }}" >> $GITHUB_ENV
               echo "AWS_SECRET_ACCESS_KEY=${{ secrets.AWS_SECRET_ACCESS_KEY }}" >> $GITHUB_ENV
-
-        -   name: Change to Terraform directory
-            run: cd terraform
             
         -   name: Initialize Terraform
-            run: terraform init        
+            run: |
+                cd terraform/
+                terraform init        
 
         -   name: Apply Terraform Changes
             run: terraform apply -auto-approve
