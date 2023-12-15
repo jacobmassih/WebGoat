@@ -112,43 +112,6 @@ jobs:
               continue-on-error: true
               run: checkov --directory=./terraform
 
-    build-infrastructure:
-        needs: lint-terraform
-        runs-on: ubuntu-latest
-        if: github.event_name == 'pull_request'
-        defaults:
-            run:
-                shell: bash
-                working-directory: terraform/
-
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v2
-
-            - name: Set up Terraform
-              uses: hashicorp/setup-terraform@v1
-
-            - name: Install Ansible
-              run: |
-                  sudo apt-get update
-                  sudo apt-get install -y ansible
-
-            - name: Set up AWS CLI with credentials
-              run: |
-                  aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
-                  aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-                  aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
-                  aws configure set region us-east-1
-
-            - name: Initialize Terraform
-              run: terraform init
-
-            - name: Destroying previous infrastructure
-              run: terraform destroy -auto-approve
-
-            - name: Apply Terraform Changes
-              run: terraform apply -auto-approve
-
     trivy-scan:
         needs: docker-build-push
         runs-on: ubuntu-latest
@@ -172,6 +135,43 @@ jobs:
                   curl -X POST -H "Content-type: application/json" --data '{
                   "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
                   }' $SLACK_WEBHOOK
+                  
+    build-infrastructure:
+      needs: [lint-terraform, trivy-scan]
+      runs-on: ubuntu-latest
+      if: github.event_name == 'pull_request'
+      defaults:
+          run:
+              shell: bash
+              working-directory: terraform/
+
+      steps:
+          - name: Checkout code
+            uses: actions/checkout@v2
+
+          - name: Set up Terraform
+            uses: hashicorp/setup-terraform@v1
+
+          - name: Install Ansible
+            run: |
+                sudo apt-get update
+                sudo apt-get install -y ansible
+
+          - name: Set up AWS CLI with credentials
+            run: |
+                aws configure set aws_access_key_id ${{ secrets.AWS_ACCESS_KEY_ID }}
+                aws configure set aws_secret_access_key ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+                aws configure set aws_session_token ${{ secrets.AWS_SESSION_TOKEN }}
+                aws configure set region us-east-1
+
+          - name: Initialize Terraform
+            run: terraform init
+
+          - name: Destroying previous infrastructure
+            run: terraform destroy -auto-approve
+
+          - name: Apply Terraform Changes
+            run: terraform apply -auto-approve
 
     zap_scan:
         needs: build-infrastructure
