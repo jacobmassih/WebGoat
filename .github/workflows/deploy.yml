@@ -128,6 +128,7 @@ jobs:
                   trivy --severity HIGH,CRITICAL --exit-code 1 ${{ secrets.DOCKERHUB_REPOSITORY }}
 
             - name: Notify Slack
+              continue-on-error: true
               if: steps.trivy-scan-cmd.outcome == 'failure'
               env:
                   SLACK_WEBHOOK: ${{ secrets.SLACK_WEBHOOK }}
@@ -135,7 +136,7 @@ jobs:
                   curl -X POST -H "Content-type: application/json" --data '{
                   "text": "Vulnerabilities detected in your Docker image! Check Trivy scan results for details."
                   }' $SLACK_WEBHOOK
-                  
+
     build-infrastructure:
       needs: [lint-terraform, trivy-scan]
       runs-on: ubuntu-latest
