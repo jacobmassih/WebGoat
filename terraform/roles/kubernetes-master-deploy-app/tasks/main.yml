@@ -2,7 +2,7 @@
   copy:
     src: deployment.yml
     dest: "/tmp/kubernetes_manifests"
-    # remote_src: yes
+    remote_src: yes
 
 - name: Deploy web app on worker node
   shell: "sudo kubectl apply -f /tmp/kubernetes_manifests"

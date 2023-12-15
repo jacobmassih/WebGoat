@@ -10,9 +10,16 @@
   roles:
     - kubernetes-worker
 
-- name: Deploy WebGoat and other utilities
+- name: Deploy WebGoat
   hosts: Master_Node
   become: true
   remote_user: ubuntu
   roles:
-    - kubernetes-master-deploy
+    - kubernetes-master-deploy-app
+
+- name: Deploy Kube-state-metrics
+  hosts: Master_Node
+  become: true
+  remote_user: ubuntu
+  roles:
+    - kubernetes-master-deploy-kube-metrics
