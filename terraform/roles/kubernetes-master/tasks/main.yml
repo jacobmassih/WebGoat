@@ -15,53 +15,43 @@
       name: docker.io
       state: present
 
-# - name: Add Kubernetes APT key
-#   become: true
-#   apt_key:
-#       url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
-#       state: present
+- name: Add Kubernetes APT key
+  become: true
+  apt_key:
+      url: https://packages.cloud.google.com/apt/doc/apt-key.gpg
+      state: present
 
-# - name: Add Kubernetes APT repo
-#   become: true
-#   apt_repository:
-#       repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
-#       state: present
+- name: Add Kubernetes APT repo
+  become: true
+  apt_repository:
+      repo: deb http://apt.kubernetes.io/ kubernetes-xenial main
+      state: present
 
-# - name: Install kubeadm, kubelet, kubectl and iproute2
-#   become: true
-#   apt:
-#       name: "{{ item }}"
-#       state: present
-#   loop:
-#       - kubeadm
-#       - kubelet
-#       - kubectl
-#       - iproute2
+- name: Install kubeadm, kubelet, kubectl and iproute2
+  become: true
+  apt:
+      name: "{{ item }}"
+      state: present
+  loop:
+      - kubeadm
+      - kubelet
+      - kubectl
+      - iproute2
 
-- name: Initialize Kubernetes master
-  community.kubernetes.core.k8s_init:
-    api_version: kubeadmin.k8s.io/v1alpha3
-    kind: InitConfiguration
-    node_name: "{{ inventory_hostname }}"
-    pod_network_cidr: 10.244.0.0/16
-    ignore_preflight_errors:
-      - SystemVerification
-  register: k8s_init_result
+- name: Copy k8s.conf file to master
+  copy:
+      src: k8s.conf
+      dest: "{{ kubernetes_config }}"
+  register: result
 
-# - name: Copy k8s.conf file to master
-#   copy:
-#       src: k8s.conf
-#       dest: "{{ kubernetes_config }}"
-#   register: result
+- name: Load settings from all system configuration files
+  shell:
+      cmd: sysctl --system
+  when: result.changed
 
-# - name: Load settings from all system configuration files
-#   shell:
-#       cmd: sysctl --system
-#   when: result.changed
-
-# - name: Initialize Kubernetes Master
-#   command: "kubeadm init --pod-network-cidr=10.244.0.0/16"
-#   when: result.changed
+- name: Initialize Kubernetes Master
+  command: "kubeadm init --pod-network-cidr=10.244.0.0/16"
+  when: result.changed
 
 - name: wait
   wait_for:
