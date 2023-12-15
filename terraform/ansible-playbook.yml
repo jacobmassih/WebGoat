@@ -15,7 +15,7 @@
   become: true
   remote_user: ubuntu
   roles:
-    - kubernetes-master-deploy-app
+    - kubernetes-master-deploy-web-app
 
 - name: Deploy Kube-state-metrics
   hosts: Master_Node
