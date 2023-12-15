@@ -34,6 +34,14 @@ jobs:
                 with:
                     name: target
                     path: target/
+
+            -   name: SonarCloud Scan
+                run: mvn sonar:sonar -X -Dsonar.projectKey=$SONAR_PROJECT_KEY -Dsonar.organization=$SONAR_ORGANIZATION -Dsonar.host.url=https://sonarcloud.io -Dsonar.login=$SONAR_TOKEN
+                env:
+                    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+                    SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+                    SONAR_PROJECT_KEY: ${{ secrets.SONAR_PROJECT_KEY }}
+                    SONAR_ORGANIZATION: ${{ secrets.SONAR_ORGANIZATION }}
     
     docker-build-push:
         needs: build
@@ -139,24 +147,8 @@ jobs:
         -   name: Apply Terraform Changes
             run: terraform apply -auto-approve
 
-
-    sonarcloud:
-        needs: [build,docker-build-push]
-        runs-on: ubuntu-latest
-        steps:
-        - uses: actions/checkout@v3
-          with:
-            # Disabling shallow clone is recommended for improving relevancy of reporting
-            fetch-depth: 0
-        - name: SonarCloud Scan
-          uses: sonarsource/sonarcloud-github-action@master
-          env:
-            GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-            SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
-
-
     zap_scan:
-        needs: sonarcloud
+ 
         runs-on: ubuntu-latest
         permissions:
             contents: read
