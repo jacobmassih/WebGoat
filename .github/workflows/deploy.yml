@@ -139,7 +139,7 @@ jobs:
     build-infrastructure:
       needs: [lint-terraform, trivy-scan]
       runs-on: ubuntu-latest
-      if: github.event_name == 'pull_request'
+      # if: github.event_name == 'pull_request'
       defaults:
           run:
               shell: bash
