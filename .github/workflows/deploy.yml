@@ -171,7 +171,6 @@ jobs:
             run: terraform destroy -auto-approve
 
           - name: Apply Terraform Changes
-            continue-on-error: true
             run: terraform apply -auto-approve
 
     zap_scan:
