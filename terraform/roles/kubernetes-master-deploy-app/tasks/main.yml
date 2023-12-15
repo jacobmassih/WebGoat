@@ -5,5 +5,5 @@
     remote_src: yes
 
 - name: Deploy web app on worker node
-  shell: "sudo kubectl apply -f /tmp/kubernetes_manifests"
+  shell: "sudo kubectl apply -f /tmp/kubernetes_manifests/deployment.yml"
   become_user: root

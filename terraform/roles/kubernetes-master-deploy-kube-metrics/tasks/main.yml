@@ -1,0 +1,19 @@
+- name: Copy k8s deployment manifest to master node
+  copy:
+    src: deployment.yml
+    dest: "/tmp/kubernetes_manifests"
+    remote_src: yes
+
+- name: Deploy kube-state-metrics
+  shell: "sudo kubectl apply -f /tmp/kubernetes_manifests/deployment.yml"
+  become_user: root
+
+- name: Copy k8s cluster role binding manifest to master node
+  copy:
+    src: cluster-role-binding.yml
+    dest: "/tmp/kubernetes_manifests"
+    remote_src: yes
+
+- name: Create service account and Cluster Role Binding
+  shell: "sudo kubectl apply -f /tmp/kubernetes_manifests/cluster-role-binding.yml"
+  become_user: root
